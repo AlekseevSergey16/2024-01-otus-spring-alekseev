@@ -8,29 +8,30 @@ import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static java.util.Objects.*;
+import static java.util.Objects.requireNonNull;
 
 @RequiredArgsConstructor
 public class CsvQuestionDao implements QuestionDao {
     private static final char SEPARATOR = ';';
+
     private static final int SKIP_LINES = 1;
 
     private final TestFileNameProvider fileNameProvider;
 
     @Override
     public List<Question> findAll() {
-        // Использовать CsvToBean
-        // https://opencsv.sourceforge.net/#collection_based_bean_fields_one_to_many_mappings
-        // Использовать QuestionReadException
-        // Про ресурсы: https://mkyong.com/java/java-read-a-file-from-resources-folder/
-
-
         ClassLoader classLoader = getClass().getClassLoader();
-        try (InputStream inputStream = requireNonNull(classLoader.getResourceAsStream(fileNameProvider.getTestFileName()));
+        String fileName = fileNameProvider.getTestFileName();
+
+        try (InputStream inputStream = requireNonNull(classLoader.getResourceAsStream(fileName));
              InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
