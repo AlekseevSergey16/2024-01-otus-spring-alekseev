@@ -3,7 +3,6 @@ package ru.otus.hw.service;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 
-import java.util.Collections;
 import java.util.List;
 
 class TestDataProvider {
