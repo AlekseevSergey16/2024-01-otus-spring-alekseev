@@ -39,7 +39,7 @@ public class CsvQuestionDao implements QuestionDao {
                     .map(QuestionDto::toDomainObject)
                     .toList();
 
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             throw new QuestionReadException("The file %s could not be read"
                     .formatted(fileNameProvider.getTestFileName()), e);
         }
