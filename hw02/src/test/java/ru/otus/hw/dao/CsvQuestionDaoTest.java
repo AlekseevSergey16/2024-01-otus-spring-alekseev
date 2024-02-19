@@ -22,7 +22,7 @@ public class CsvQuestionDaoTest {
     void shouldFindAllQuestions() {
         //given
         QuestionDao sut = new CsvQuestionDao(new AppProperties(3, TEST_QUESTIONS_FILE_NAME));
-        List<Question> expectedQuestions = testDataProvider.getTestQuestions();
+        List<Question> expectedQuestions = testDataProvider.createTestQuestions();
 
         //when
         List<Question> actualQuestions = sut.findAll();
