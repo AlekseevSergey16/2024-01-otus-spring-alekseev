@@ -7,3 +7,4 @@
 **Слушатель**: Алексеев Сергей Алексеевич
 
 - hw01 - Spring with xml context
+- hw02 - Spring with Java /Annotation-based context
