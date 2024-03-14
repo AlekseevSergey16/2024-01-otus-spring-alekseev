@@ -1,0 +1,3 @@
+# Добавить сюда своих вопросов. Эту строку надо пропустить при настройке CsvToBean (withSkipLines)
+What is the best programming language?;Java%true|C#%false|C++%false
+How often are the Winter Olympic Games held?;Every year%false|Every 2 years%false|Every 4 years%true
