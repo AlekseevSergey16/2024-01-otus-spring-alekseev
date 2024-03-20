@@ -9,3 +9,4 @@
 - hw01 - Spring with xml context
 - hw02 - Spring with Java /Annotation-based context
 - hw03 - Spring boot
+- hw04 - Spring shell and Spring boot test
