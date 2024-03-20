@@ -1,6 +1,5 @@
 package ru.otus.hw;
 
-import org.springframework.boot.test.context.TestComponent;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.domain.Student;
