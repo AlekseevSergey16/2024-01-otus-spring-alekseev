@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset salekseev:2024-03-21--load_data
 insert into authors(full_name)
 values ('Author_1'), ('Author_2'), ('Author_3');
 
