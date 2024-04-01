@@ -12,15 +12,17 @@ import ru.otus.hw.models.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
 public class JdbcBookRepository implements BookRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
-
-    private final GenreRepository genreRepository;
 
     @Override
     public Optional<Book> findById(long id) {
@@ -44,10 +46,9 @@ public class JdbcBookRepository implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        var genres = genreRepository.findAll();
-        var relations = getAllGenreRelations();
-        var books = getAllBooksWithoutGenres();
-        mergeBooksInfo(books, genres, relations);
+        List<Book> books = getAllBooksWithoutGenres();
+        Map<Long, List<Genre>> bookIdGenresMap = getGenresByBookIdMap();
+        mergeBooksInfo(books, bookIdGenresMap);
         return books;
     }
 
@@ -73,42 +74,18 @@ public class JdbcBookRepository implements BookRepository {
         return jdbc.query(sql, JdbcBookRepository::bookMapper);
     }
 
-    private List<BookGenreRelation> getAllGenreRelations() {
-        return jdbc.query("SELECT book_id, genre_id FROM books_genres",
-                JdbcBookRepository::bookGenreRelationMapper);
-    }
-
     private Map<Long, List<Genre>> getGenresByBookIdMap() {
         final String sql = """
                 SELECT book_id, genre_id, genres.name AS genre_name
                 FROM books_genres
                 INNER JOIN genres ON genres.id = books_genres.genre_id
                 """;
-        return jdbc.query(sql, rs -> {
-            Map<Long, List<Genre>> bookIdGenresMap = new HashMap<>();
-
-            while (rs.next()) {
-                long bookId = rs.getLong("book_id");
-                List<Genre> genres = bookIdGenresMap.computeIfAbsent(bookId, k -> new ArrayList<>());
-                genres.add(new Genre(rs.getLong("genre_id"), rs.getString("genre_name")));
-            }
-
-            return bookIdGenresMap;
-        });
+        return jdbc.query(sql, JdbcBookRepository::bookIdGenresMapper);
     }
 
-    private void mergeBooksInfo(List<Book> booksWithoutGenres, List<Genre> genres,
-                                List<BookGenreRelation> relations) {
-        // Добавить книгам (booksWithoutGenres) жанры (genres) в соответствии со связями (relations)
+    private void mergeBooksInfo(List<Book> booksWithoutGenres, Map<Long, List<Genre>> bookIdGenresMap) {
         for (Book book : booksWithoutGenres) {
-            for (BookGenreRelation bookGenreRelation : relations) {
-                if (book.getId() == bookGenreRelation.bookId()) {
-                    Genre genre = genres.stream()
-                            .filter(g -> g.getId() == bookGenreRelation.genreId())
-                            .findAny().orElseThrow();
-                    book.getGenres().add(genre);
-                }
-            }
+            book.setGenres(bookIdGenresMap.get(book.getId()));
         }
     }
 
@@ -188,6 +165,18 @@ public class JdbcBookRepository implements BookRepository {
                 new ArrayList<>());
     }
 
+    private static Map<Long, List<Genre>> bookIdGenresMapper(ResultSet rs) throws SQLException {
+        Map<Long, List<Genre>> bookIdGenresMap = new HashMap<>();
+
+        while (rs.next()) {
+            long bookId = rs.getLong("book_id");
+            List<Genre> genres = bookIdGenresMap.computeIfAbsent(bookId, k -> new ArrayList<>());
+            genres.add(new Genre(rs.getLong("genre_id"), rs.getString("genre_name")));
+        }
+
+        return bookIdGenresMap;
+    }
+
     // Использовать для findById
     private static Book bookResultSetExtractor(ResultSet rs) throws SQLException {
         Book book = null;
@@ -202,12 +191,5 @@ public class JdbcBookRepository implements BookRepository {
             genres.add(new Genre(rs.getLong("genre_id"), rs.getString("genre_name")));
         }
         return book;
-    }
-
-    private static BookGenreRelation bookGenreRelationMapper(ResultSet rs, int n) throws SQLException {
-        return new BookGenreRelation(rs.getLong("book_id"), rs.getLong("genre_id"));
-    }
-
-    private record BookGenreRelation(long bookId, long genreId) {
     }
 }
