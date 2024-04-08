@@ -10,3 +10,4 @@
 - hw02 - Spring with Java /Annotation-based context
 - hw03 - Spring boot
 - hw04 - Spring shell and Spring boot test
+- hw05 - Spring JDBC
