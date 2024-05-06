@@ -1,7 +1,6 @@
 package ru.otus.hw.dto.author;
 
 import org.springframework.stereotype.Component;
-import ru.otus.hw.dto.author.AuthorDto;
 import ru.otus.hw.models.Author;
 
 @Component

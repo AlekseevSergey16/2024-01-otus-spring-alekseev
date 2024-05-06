@@ -6,8 +6,6 @@ import ru.otus.hw.dto.author.AuthorMapper;
 import ru.otus.hw.dto.genre.GenreMapper;
 import ru.otus.hw.models.Book;
 
-import java.util.stream.Collectors;
-
 @RequiredArgsConstructor
 @Component
 public class BookMapper {
