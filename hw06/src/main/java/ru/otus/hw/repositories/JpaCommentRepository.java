@@ -27,14 +27,16 @@ public class JpaCommentRepository implements CommentRepository {
 
     @Override
     public void deleteById(long id) {
-        em.remove(em.find(Comment.class, id));
+        var comment = em.find(Comment.class, id);
+        if (comment != null) {
+            em.remove(comment);
+        }
     }
 
     @Override
     public Optional<Comment> findById(long id) {
         return em.createQuery("select c from Comment c where c.id = :id", Comment.class)
                 .setParameter("id", id)
-                .setHint("jakarta.persistence.fetchgraph", em.getEntityGraph("comment-with-book-graph"))
                 .getResultList().stream().findAny();
     }
 

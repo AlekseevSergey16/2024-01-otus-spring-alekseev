@@ -27,12 +27,18 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public void deleteById(long id) {
-        em.remove(em.find(Book.class, id));
+        var book = em.find(Book.class, id);
+        if (book != null) {
+            em.remove(em.find(Book.class, id));
+        }
     }
 
     @Override
     public Optional<Book> findById(long id) {
-        return Optional.ofNullable(em.find(Book.class, id));
+        return em.createQuery("from Book where id = :id", Book.class)
+                .setHint("jakarta.persistence.fetchgraph", em.getEntityGraph("book-with-author-graph"))
+                .setParameter("id", id)
+                .getResultList().stream().findAny();
     }
 
     @Override
