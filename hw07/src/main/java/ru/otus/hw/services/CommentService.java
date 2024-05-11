@@ -10,7 +10,7 @@ public interface CommentService {
 
     CommentDto insert(String text, long bookId);
 
-    CommentDto update(long id, String text, long bookId);
+    CommentDto update(long id, String text);
 
     Optional<CommentDto> findById(long id);
 

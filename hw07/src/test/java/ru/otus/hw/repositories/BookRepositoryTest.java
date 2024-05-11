@@ -94,6 +94,19 @@ public class BookRepositoryTest {
         assertThat(em.find(Book.class, expectedBook.getId())).isNull();
     }
 
+    @Test
+    void shouldDeleteBookWithComment() {
+        //given
+        Book expectedBook = em.find(Book.class, 1);
+
+        //when
+        repository.deleteById(expectedBook.getId());
+        em.flush();
+
+        //then
+        assertThat(em.find(Book.class, expectedBook.getId())).isNull();
+    }
+
     private static void assertBook(Book actualBook, Book expectedBook) {
         assertThat(actualBook.getId()).isEqualTo(expectedBook.getId());
         assertThat(actualBook.getTitle()).isEqualTo(expectedBook.getTitle());
