@@ -25,6 +25,8 @@ import java.util.Set;
 
 @NamedEntityGraph(name = "book-with-author-graph",
         attributeNodes = @NamedAttributeNode("author"))
+@NamedEntityGraph(name = "book-with-author-and-genres-graph",
+        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genres")})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    @EntityGraph("book-with-author-graph")
+    @EntityGraph("book-with-author-and-genres-graph")
     Optional<Book> findById(Long id);
 
     @EntityGraph("book-with-author-graph")
