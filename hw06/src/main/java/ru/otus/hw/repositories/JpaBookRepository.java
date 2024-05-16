@@ -36,7 +36,7 @@ public class JpaBookRepository implements BookRepository {
     @Override
     public Optional<Book> findById(long id) {
         return em.createQuery("from Book where id = :id", Book.class)
-                .setHint("jakarta.persistence.fetchgraph", em.getEntityGraph("book-with-author-graph"))
+                .setHint("jakarta.persistence.fetchgraph", em.getEntityGraph("book-with-author-and-genres-graph"))
                 .setParameter("id", id)
                 .getResultList().stream().findAny();
     }
