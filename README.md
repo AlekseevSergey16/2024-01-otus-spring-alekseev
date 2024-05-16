@@ -11,3 +11,4 @@
 - hw03 - Spring boot
 - hw04 - Spring shell and Spring boot test
 - hw05 - Spring JDBC
+- hw06 - Spring ORM + JPA + Hibernate
