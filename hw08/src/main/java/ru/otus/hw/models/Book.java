@@ -11,7 +11,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @Document("books")
 public final class Book {
 

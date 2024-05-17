@@ -1,0 +1,19 @@
+spring:
+  data:
+    mongodb:
+      port: 0
+      database: test
+
+mongock:
+  runner-type: applicationrunner
+  change-logs-scan-package: ru.otus.hw.changelogs
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2
