@@ -15,9 +15,3 @@ mongock:
     write-concern:
       journal: false
     read-concern: local
-
-#de:
-#  flapdoodle:
-#    mongodb:
-#      embedded:
-#        version: 4.0.2

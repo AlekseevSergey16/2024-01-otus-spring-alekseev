@@ -95,6 +95,20 @@ public class CommentRepositoryTest {
                 .anyMatch(comment -> comment.getText().equals(expectedComments.get(1).getText()));
     }
 
+    @Test
+    void shouldDeleteCommentByBookId() {
+        //given
+        repository.deleteAll();
+        Book book = Book.builder().id(FIRST_BOOK_ID).build();
+        Comment comment = mongoTemplate.insert(aComment().text("comment text1").book(book).build());
+
+        //when
+        repository.deleteByBookId(book.getId());
+
+        //then
+        assertThat(mongoTemplate.findById(comment.getId(), Comment.class)).isNull();
+    }
+
     private Comment.CommentBuilder aComment() {
         return Comment.builder()
                 .text("comment");
