@@ -11,7 +11,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class CreateBookDto {
+public class BookCreateDto {
 
     private Long id;
 

@@ -2,7 +2,7 @@ package ru.otus.hw.controllers;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import ru.otus.hw.dto.book.CreateBookDto;
+import ru.otus.hw.dto.book.BookCreateDto;
 import ru.otus.hw.dto.genre.GenreDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class BookController {
 
     @GetMapping("/books")
     public String createPage(Model model) {
-        model.addAttribute("book", new CreateBookDto());
+        model.addAttribute("book", new BookCreateDto());
         model.addAttribute("authors", authorService.findAll());
         model.addAttribute("genres", genreService.findAll());
         return "book-form";
@@ -46,7 +46,7 @@ public class BookController {
     @GetMapping("/books/{id}")
     public String editPage(@PathVariable long id, Model model) {
         BookDto book = bookService.findById(id).orElseThrow(EntityNotFoundException::new);
-        CreateBookDto bookDto = new CreateBookDto(book.id(), book.title(), book.author().id(), book.genres().stream()
+        BookCreateDto bookDto = new BookCreateDto(book.id(), book.title(), book.author().id(), book.genres().stream()
                 .map(GenreDto::id).collect(Collectors.toSet()));
         model.addAttribute("book", bookDto);
         model.addAttribute("authors", authorService.findAll());
@@ -55,14 +55,20 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public String createBook(@ModelAttribute CreateBookDto book, Model model) {
+    public String createBook(@ModelAttribute BookCreateDto book) {
         bookService.insert(book.getTitle(), book.getAuthorId(), book.getGenreIds());
         return "redirect:/";
     }
 
     @PostMapping("/books/{id}")
-    public String editBook(@PathVariable long id, @ModelAttribute CreateBookDto book, Model model) {
+    public String editBook(@PathVariable long id, @ModelAttribute BookCreateDto book) {
         bookService.update(id, book.getTitle(), book.getAuthorId(), book.getGenreIds());
+        return "redirect:/";
+    }
+
+    @PostMapping("/books/{id}/delete")
+    public String deleteBook(@PathVariable long id) {
+        bookService.deleteById(id);
         return "redirect:/";
     }
 
