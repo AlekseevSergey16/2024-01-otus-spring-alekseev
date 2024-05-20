@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<form id="edit-form" th:object="${book}"
+      th:action="@{${book.id == null ? '/books' : '/books/' + book.id}}"
+      th:method="post"
+      method="post">
+    <h3>Book Info:</h3>
+
+    <div class="row">
+        <label for="id-input">Id:</label>
+        <input id="id-input" type="text" readonly="readonly" value="1" th:field="*{id}"/>
+    </div>
+
+    <div class="row">
+        <label for="title-input">Title:</label>
+        <input id="title-input" name="title" type="text" value="1" th:field="*{title}"/>
+    </div>
+
+    <div class="row">
+        <label for="author-select">Author:</label>
+        <select id="author-select" th:field="*{authorId}">
+            <option th:each="a : ${authors}"
+                    th:value="${a.id}"
+                    th:text="${a.fullName}"
+                    th:selected="*{authorId}">
+                Select author
+            </option>
+        </select>
+    </div>
+
+    <div class="row">
+        <label for="genres-select">Author:</label>
+        <select id="genres-select" th:field="*{genreIds}" multiple>
+            <option th:each="g : ${genres}"
+                    th:field="*{genreIds}"
+                    th:value="${g.id}"
+                    th:text="${g.name}">
+                Select genres
+            </option>
+        </select>
+    </div>
+
+    <div class="row">
+        <button type="submit">Save</button>
+        <a href="book-list-page.html" th:href="@{''}"><button type="button">Cancel</button></a>
+    </div>
+</form>
+</body>
+<!--th:action="${book.id} == null}?@{/books}:@{/books/{id}(id={book.id})"-->
+</html>
