@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.dto.author.AuthorDto;
 import ru.otus.hw.dto.book.BookDto;
 import ru.otus.hw.dto.genre.GenreDto;
+import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
@@ -20,7 +21,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 @WebMvcTest(BookController.class)
 public class BookControllerTest {
@@ -75,7 +75,7 @@ public class BookControllerTest {
         List<AuthorDto> authors = List.of(new AuthorDto(1, "full name"), new AuthorDto(2, "full name2"));
         List<GenreDto> genres = List.of(new GenreDto(1, "genre1"), new GenreDto(2, "genre2"));
         BookDto book = new BookDto(10, "title", authors.get(0), genres);
-        when(bookService.findById(10)).thenReturn(Optional.of(book));
+        when(bookService.findById(10)).thenReturn(book);
         when(authorService.findAll()).thenReturn(authors);
         when(genreService.findAll()).thenReturn(genres);
 
@@ -91,7 +91,7 @@ public class BookControllerTest {
     @Test
     void shouldReturn404WhenEditPageIfBookNotFound() throws Exception {
         //given
-        when(bookService.findById(anyLong())).thenReturn(Optional.empty());
+        when(bookService.findById(anyLong())).thenThrow(EntityNotFoundException.class);
 
         //when then
         mockMvc.perform(get("/books/10")).andExpect(status().isNotFound());
@@ -133,7 +133,7 @@ public class BookControllerTest {
         BookDto book = new BookDto(10, "title", authors.get(0), genres);
         when(authorService.findAll()).thenReturn(authors);
         when(genreService.findAll()).thenReturn(genres);
-        when(bookService.findById(10)).thenReturn(Optional.of(book));
+        when(bookService.findById(10)).thenReturn(book);
         when(bookService.update(eq(10), any())).thenReturn(null);
 
         //when then

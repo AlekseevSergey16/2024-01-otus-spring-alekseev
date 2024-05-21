@@ -11,9 +11,9 @@ import ru.otus.hw.exceptions.EntityNotFoundException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFoundEx(EntityNotFoundException e) {
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException e) {
         log.error("not found", e);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(404).body("error 404: not found");
     }
 
 }

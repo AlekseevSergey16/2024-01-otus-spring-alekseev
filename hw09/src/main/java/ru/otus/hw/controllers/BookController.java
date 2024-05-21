@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.hw.dto.book.BookCreateDto;
 import ru.otus.hw.dto.genre.GenreDto;
-import ru.otus.hw.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,7 +45,7 @@ public class BookController {
 
     @GetMapping("/books/{id}")
     public String editPage(@PathVariable long id, Model model) {
-        BookDto book = bookService.findById(id).orElseThrow(EntityNotFoundException::new);
+        BookDto book = bookService.findById(id);
         BookCreateDto bookDto = new BookCreateDto(book.id(), book.title(), book.author().id(), book.genres().stream()
                 .map(GenreDto::id).collect(Collectors.toSet()));
         model.addAttribute("book", bookDto);

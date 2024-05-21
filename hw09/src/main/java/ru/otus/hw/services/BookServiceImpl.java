@@ -16,7 +16,6 @@ import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -33,9 +32,10 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<BookDto> findById(long id) {
+    public BookDto findById(long id) {
         return bookRepository.findById(id)
-                .map(bookMapper::toDto);
+                .map(bookMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
     }
 
     @Transactional(readOnly = true)
@@ -70,10 +70,6 @@ public class BookServiceImpl implements BookService {
     }
 
     private Book save(long id, String title, long authorId, Set<Long> genresIds) {
-        if (genresIds.isEmpty()) {
-            throw new IllegalArgumentException("Genres ids must not be null");
-        }
-
         List<Genre> genres = genreRepository.findAllById(genresIds);
         if (genres.isEmpty() || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
