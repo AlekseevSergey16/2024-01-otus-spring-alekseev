@@ -3,6 +3,7 @@ package ru.otus.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.dto.comment.CommentCreateDto;
 import ru.otus.hw.dto.comment.CommentDto;
 import ru.otus.hw.dto.comment.CommentMapper;
 import ru.otus.hw.dto.comment.CommentSummaryDto;
@@ -27,11 +28,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public CommentDto insert(String text, long bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(bookId)));
+    public CommentDto create(CommentCreateDto commentDto) {
+        Book book = bookRepository.findById(commentDto.getBookId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Book with id %d not found".formatted(commentDto.getBookId())));
 
-        Comment comment = new Comment(0, text, book);
+        Comment comment = new Comment(0, commentDto.getText(), book);
 
         return commentMapper.toDto(commentRepository.save(comment));
     }

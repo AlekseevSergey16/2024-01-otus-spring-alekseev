@@ -46,8 +46,10 @@
         <td th:text="${#strings.listJoin(book.genres.![name], ', ')}">genres</td>
         <td><a href="book-form.html" th:href="@{/books/{id}/comments(id=${book.id})}">show comments</a></td>
         <td>
-            <a href="book-form.html" th:href="@{/books/(bookId=${book.id})}">edit</a>
-            <a href="book-form.html" th:href="@{/books/{id}/delete(id=${book.id})}">delete</a>
+            <a href="book-form.html" th:href="@{/books/{bookId}(bookId=${book.id})}">edit</a>
+            <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post">
+                <button type="submit">delete</button>
+            </form>
         </td>
     </tr>
     </tbody>

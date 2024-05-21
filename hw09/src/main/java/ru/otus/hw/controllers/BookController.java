@@ -1,5 +1,6 @@
 package ru.otus.hw.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.hw.dto.book.BookCreateDto;
@@ -55,14 +56,14 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public String createBook(@ModelAttribute BookCreateDto book) {
-        bookService.insert(book.getTitle(), book.getAuthorId(), book.getGenreIds());
+    public String createBook(@ModelAttribute @Valid BookCreateDto book) {
+        bookService.create(book);
         return "redirect:/";
     }
 
     @PostMapping("/books/{id}")
-    public String editBook(@PathVariable long id, @ModelAttribute BookCreateDto book) {
-        bookService.update(id, book.getTitle(), book.getAuthorId(), book.getGenreIds());
+    public String editBook(@PathVariable long id, @ModelAttribute @Valid BookCreateDto book) {
+        bookService.update(id, book);
         return "redirect:/";
     }
 
