@@ -116,7 +116,7 @@ public class BookRepositoryTest {
 
     private Book.BookBuilder aBook() {
         return Book.builder()
-                .id(0)
+                .id(null)
                 .title("Book title")
                 .author(em.getEntityManager().getReference(Author.class, 1))
                 .genres(new HashSet<>(Arrays.asList(
@@ -138,7 +138,7 @@ public class BookRepositoryTest {
 
     private static List<Book> getDbBooks(List<Author> dbAuthors, List<Genre> dbGenres) {
         return IntStream.range(1, 4).boxed()
-                .map(id -> new Book(id,
+                .map(id -> new Book(Long.valueOf(id),
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
                         new HashSet<>(dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2))

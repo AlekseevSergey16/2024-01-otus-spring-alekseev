@@ -20,28 +20,28 @@
         .row {
             margin-top: 10px;
         }
+
+        .errors {
+            color: red;
+        }
     </style>
 </head>
 <body>
-<form id="edit-form" th:object="${book}"
-      th:action="@{${book.id == null ? '/books' : '/books/' + book.id}}"
+<form id="book-form" th:object="${book}"
+      th:action="@{${bookId == null ? '/books' : '/books/' + bookId}}"
       th:method="post"
       method="post">
     <h3>Book Info:</h3>
 
     <div class="row">
-        <label for="id-input">Id:</label>
-        <input id="id-input" type="text" readonly="readonly" value="1" th:field="*{id}"/>
-    </div>
-
-    <div class="row">
         <label for="title-input">Title:</label>
-        <input id="title-input" name="title" type="text" value="1" th:field="*{title}"/>
+        <input id="title-input" name="title" type="text" value="1" th:field="*{title}" th:errorclass="errors"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="${book.title}">the field is required</div>
     </div>
 
     <div class="row">
         <label for="author-select">Author:</label>
-        <select id="author-select" th:field="*{authorId}">
+        <select id="author-select" th:field="*{authorId}" th:errorclass="fieldError">
             <option th:each="a : ${authors}"
                     th:value="${a.id}"
                     th:text="${a.fullName}"
@@ -49,11 +49,12 @@
                 Select author
             </option>
         </select>
+        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="${book.authorId}">the field is required</div>
     </div>
 
     <div class="row">
         <label for="genres-select">Genres:</label>
-        <select id="genres-select" th:field="*{genreIds}" multiple>
+        <select id="genres-select" th:field="*{genreIds}" th:errorclass="fieldError" multiple>
             <option th:each="g : ${genres}"
                     th:field="*{genreIds}"
                     th:value="${g.id}"
@@ -61,6 +62,7 @@
                 Select genres
             </option>
         </select>
+        <div class="errors" th:if="${#fields.hasErrors('genreIds')}" th:errors="${book.genreIds}">the field is required</div>
     </div>
 
     <div class="row">

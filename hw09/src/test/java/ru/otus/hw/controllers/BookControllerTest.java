@@ -7,6 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.dto.author.AuthorDto;
 import ru.otus.hw.dto.book.BookDto;
+import ru.otus.hw.dto.book.BookSummaryDto;
 import ru.otus.hw.dto.genre.GenreDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.services.AuthorService;
@@ -14,7 +15,7 @@ import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
@@ -74,7 +75,8 @@ public class BookControllerTest {
         //given
         List<AuthorDto> authors = List.of(new AuthorDto(1, "full name"), new AuthorDto(2, "full name2"));
         List<GenreDto> genres = List.of(new GenreDto(1, "genre1"), new GenreDto(2, "genre2"));
-        BookDto book = new BookDto(10, "title", authors.get(0), genres);
+        BookSummaryDto book = new BookSummaryDto(10L, "title", authors.get(0).id(), genres.stream()
+                .map(GenreDto::id).collect(Collectors.toSet()));
         when(bookService.findById(10)).thenReturn(book);
         when(authorService.findAll()).thenReturn(authors);
         when(genreService.findAll()).thenReturn(genres);
@@ -122,7 +124,23 @@ public class BookControllerTest {
                         .param("title", "  ")
                         .param("authorId", "")
                         .param("genreIds", "1,2"))
-                .andExpect(status().isBadRequest());
+                .andExpect(model().hasErrors())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldBadRequestWhenUpdateInvalidBook() throws Exception {
+        //given
+        when(bookService.update(any())).thenReturn(null);
+
+        //when then
+        mockMvc.perform(post("/books/1")
+                        .param("id", "1")
+                        .param("title", "title")
+                        .param("authorId", "1")
+                        .param("genreIds", ""))
+                .andExpect(model().hasErrors())
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -130,11 +148,12 @@ public class BookControllerTest {
         //given
         List<AuthorDto> authors = List.of(new AuthorDto(1, "full name"), new AuthorDto(2, "full name2"));
         List<GenreDto> genres = List.of(new GenreDto(1, "genre1"), new GenreDto(2, "genre2"));
-        BookDto book = new BookDto(10, "title", authors.get(0), genres);
+        BookSummaryDto book = new BookSummaryDto(10L, "title", 1L, genres.stream()
+                .map(GenreDto::id).collect(Collectors.toSet()));
         when(authorService.findAll()).thenReturn(authors);
         when(genreService.findAll()).thenReturn(genres);
         when(bookService.findById(10)).thenReturn(book);
-        when(bookService.update(eq(10), any())).thenReturn(null);
+        when(bookService.update(any())).thenReturn(null);
 
         //when then
         mockMvc.perform(post("/books/10")
@@ -143,7 +162,7 @@ public class BookControllerTest {
                         .param("genreIds", "1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(model().hasNoErrors())
-                .andExpect(redirectedUrl("/"));
+                .andExpect(redirectedUrl("/books/10"));
     }
 
     @Test

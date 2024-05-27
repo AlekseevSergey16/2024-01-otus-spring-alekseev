@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.book.BookCreateDto;
 import ru.otus.hw.dto.book.BookDto;
 import ru.otus.hw.dto.book.BookMapper;
+import ru.otus.hw.dto.book.BookSummaryDto;
+import ru.otus.hw.dto.book.BookUpdateDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -16,7 +18,6 @@ import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -32,9 +33,9 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public BookDto findById(long id) {
+    public BookSummaryDto findById(long id) {
         return bookRepository.findById(id)
-                .map(bookMapper::toDto)
+                .map(bookMapper::toSummaryDto)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
     }
 
@@ -49,18 +50,44 @@ public class BookServiceImpl implements BookService {
     @Transactional
     @Override
     public BookDto create(BookCreateDto bookDto) {
-        Book book = save(0, bookDto.getTitle(), bookDto.getAuthorId(), bookDto.getGenreIds());
+        List<Genre> genres = genreRepository.findAllById(bookDto.getGenreIds());
+        if (genres.isEmpty() || bookDto.getGenreIds().size() != genres.size()) {
+            throw new EntityNotFoundException(
+                    "One or all genres with ids %s not found".formatted(bookDto.getGenreIds()));
+        }
+
+        Author author = authorRepository.findById(bookDto.getAuthorId()).orElseThrow(() ->
+                new EntityNotFoundException("Author with id %d not found".formatted(bookDto.getAuthorId())));
+
+        Book book = bookRepository.save(Book.builder()
+                .title(bookDto.getTitle())
+                .author(author)
+                .genres(new HashSet<>(genres))
+                .build());
+
         return bookMapper.toDto(book);
     }
 
     @Transactional
     @Override
-    public BookDto update(long id, BookCreateDto bookDto) {
-        if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("Book with id %d not found".formatted(id));
+    public BookDto update(BookUpdateDto bookDto) {
+        Book book = bookRepository.findById(bookDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(bookDto.getId())));
+
+        List<Genre> genres = genreRepository.findAllById(bookDto.getGenreIds());
+        if (genres.isEmpty() || bookDto.getGenreIds().size() != genres.size()) {
+            throw new EntityNotFoundException(
+                    "One or all genres with ids %s not found".formatted(bookDto.getGenreIds()));
         }
-        Book book = save(id, bookDto.getTitle(), bookDto.getAuthorId(), bookDto.getGenreIds());
-        return bookMapper.toDto(book);
+
+        Author author = authorRepository.findById(bookDto.getAuthorId()).orElseThrow(() ->
+                new EntityNotFoundException("Author with id %d not found".formatted(bookDto.getAuthorId())));
+
+        book.setTitle(bookDto.getTitle());
+        book.setAuthor(author);
+        book.setGenres(new HashSet<>(genres));
+
+        return bookMapper.toDto(bookRepository.save(book));
     }
 
     @Transactional
@@ -69,17 +96,4 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-    private Book save(long id, String title, long authorId, Set<Long> genresIds) {
-        List<Genre> genres = genreRepository.findAllById(genresIds);
-        if (genres.isEmpty() || genresIds.size() != genres.size()) {
-            throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
-        }
-
-        Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
-
-        Book book = new Book(id, title, author, new HashSet<>(genres));
-
-        return bookRepository.save(book);
-    }
 }
