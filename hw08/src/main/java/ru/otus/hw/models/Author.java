@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Getter
 @Document("authors")
-public final class Author {
+public class Author {
 
     @Id
     private final String id;

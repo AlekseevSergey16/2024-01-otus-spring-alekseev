@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -13,17 +12,15 @@ import java.util.List;
 @Getter
 @Builder(toBuilder = true)
 @Document("books")
-public final class Book {
+public class Book {
 
     @Id
     private final String id;
 
     private final String title;
 
-    @DBRef
     private final Author author;
 
-    @DBRef(lazy = true)
     private final List<Genre> genres;
 
 }

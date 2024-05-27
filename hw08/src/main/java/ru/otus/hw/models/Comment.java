@@ -11,14 +11,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Builder
 @Document("comments")
-public final class Comment {
+public class Comment {
 
     @Id
     private final String id;
 
     private final String text;
 
-    @DBRef
+    @DBRef(lazy = true)
     private final Book book;
 
     public Comment withText(String text) {

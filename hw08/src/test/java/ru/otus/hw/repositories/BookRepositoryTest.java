@@ -1,5 +1,6 @@
 package ru.otus.hw.repositories;
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ public class BookRepositoryTest {
     @Test
     void shouldDeleteBookWithComment() {
         //given
-        Book expectedBook = mongoTemplate.insert(aBook().title("Interesting book").build());
+        Book expectedBook = mongoTemplate.insert(aBook().build());
 
         //when
         repository.deleteById(expectedBook.getId());
@@ -88,7 +89,11 @@ public class BookRepositoryTest {
         assertThat(actualBook.getId()).isEqualTo(expectedBook.getId());
         assertThat(actualBook.getTitle()).isEqualTo(expectedBook.getTitle());
         assertThat(actualBook.getAuthor().getId()).isEqualTo(expectedBook.getAuthor().getId());
-        assertThat(actualBook.getGenres()).hasSize(expectedBook.getGenres().size());
+        assertThat(actualBook.getAuthor().getFullName()).isEqualTo(expectedBook.getAuthor().getFullName());
+        assertThat(actualBook.getGenres())
+                .hasSize(expectedBook.getGenres().size())
+                .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder().build())
+                .containsExactlyInAnyOrderElementsOf(expectedBook.getGenres());
     }
 
     private Book.BookBuilder aBook() {
