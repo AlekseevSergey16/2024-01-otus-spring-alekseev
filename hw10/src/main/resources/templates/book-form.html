@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        .errors {
+            color: red;
+        }
+    </style>
+</head>
+<body onload="initForm()">
+<h3>Book Info:</h3>
+<form id="book-form" method="post">
+    <div class="row">
+        <label for="title-input">Title:</label>
+        <input id="title-input" name="title" type="text"/>
+    </div>
+
+    <div class="row">
+        <label for="author-select">Author:</label>
+        <select id="author-select"></select>
+    </div>
+
+    <div class="row">
+        <label for="genres-select">Genres:</label>
+        <select id="genres-select" multiple></select>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="saveBook()">Save</button>
+        <a href="book-list-page.html"><button type="button">Cancel</button></a>
+    </div>
+</form>
+<script>
+    const authorSelect = document.getElementById('author-select');
+    const genresSelect = document.getElementById('genres-select');
+
+    const initForm = () => {
+        fetchAuthors();
+        fetchGenres();
+    }
+
+    const fetchAuthors = () => fetch('/api/authors')
+        .then(resp => resp.json())
+        .then(authors => authors.forEach(author => {
+            const option = document.createElement('option');
+            option.value = author.id;
+            option.text = author.fullName;
+            authorSelect.appendChild(option);
+        }));
+
+    const fetchGenres = () => fetch('/api/genres')
+        .then(resp => resp.json())
+        .then(genres => genres.forEach(genre => {
+            const option = document.createElement('option');
+            option.value = genre.id;
+            option.text = genre.name;
+            genresSelect.appendChild(option);
+        }));
+
+    const saveBook = () => fetch('/api/books',
+        {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(buildBook())
+        })
+        .then(rawResponse => rawResponse.json())
+        .then(_ => window.location = '/');
+
+    const buildBook = () => {
+        return {
+            title: document.getElementById('title-input').value,
+            authorId: authorSelect.options[authorSelect.selectedIndex].value,
+            genreIds: Array.from(genresSelect.selectedOptions).map(o => o.value)
+        }
+    }
+</script>
+</body>
+</html>
