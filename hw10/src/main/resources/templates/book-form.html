@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Book</title>
@@ -25,10 +25,13 @@
             color: red;
         }
     </style>
+    <script type="text/javascript" th:src="@{/api.js}"></script>
 </head>
 <body onload="initForm()">
 <h3>Book Info:</h3>
 <form id="book-form" method="post">
+    <input id="bookId" type="hidden" value="" th:value="${bookId}" />
+
     <div class="row">
         <label for="title-input">Title:</label>
         <input id="title-input" name="title" type="text"/>
@@ -46,51 +49,88 @@
 
     <div class="row">
         <button type="button" onclick="saveBook()">Save</button>
-        <a href="book-list-page.html"><button type="button">Cancel</button></a>
+        <a href="book-list-page.html"><button type="button">Back</button></a>
     </div>
 </form>
 <script>
+    const bookId = document.getElementById('bookId').value;
+    const titleInput = document.getElementById('title-input');
     const authorSelect = document.getElementById('author-select');
     const genresSelect = document.getElementById('genres-select');
 
     const initForm = () => {
-        fetchAuthors();
-        fetchGenres();
+        if (bookId === '') {
+            initCreateForm();
+            return;
+        }
+        initEditForm();
     }
 
-    const fetchAuthors = () => fetch('/api/authors')
-        .then(resp => resp.json())
-        .then(authors => authors.forEach(author => {
-            const option = document.createElement('option');
-            option.value = author.id;
-            option.text = author.fullName;
-            authorSelect.appendChild(option);
-        }));
+    const initCreateForm = () => {
+        fetchAuthors()
+            .then(authors => authors.map(a => createAuthorOption(a)).forEach(opt => authorSelect.appendChild(opt)))
+            .catch(r => alert(r));
+        fetchGenres()
+            .then(genres => genres.map(g => createGenreOption(g)).forEach(opt => genresSelect.appendChild(opt)))
+            .catch(r => alert(r));
+    }
 
-    const fetchGenres = () => fetch('/api/genres')
-        .then(resp => resp.json())
-        .then(genres => genres.forEach(genre => {
-            const option = document.createElement('option');
-            option.value = genre.id;
-            option.text = genre.name;
-            genresSelect.appendChild(option);
-        }));
+    const initEditForm = () => {
+        fetchBookById(bookId)
+            .then(book => fillBook(book))
+            .catch(r => alert(r));
+    }
 
-    const saveBook = () => fetch('/api/books',
-        {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(buildBook())
-        })
-        .then(rawResponse => rawResponse.json())
-        .then(_ => window.location = '/');
+    const fillBook = book => {
+        titleInput.value = book.title;
+        fetchAuthors()
+            .then(authors => authors.forEach(author => {
+                const authorOption = createAuthorOption(author);
+                if (book.authorId === author.id) {
+                    authorOption.selected = true;
+                }
+                authorSelect.appendChild(authorOption);
+            }));
+
+        fetchGenres()
+            .then(genres => genres.forEach(genre => {
+                const genreOption = createGenreOption(genre);
+                if (book.genreIds.includes(genre.id)) {
+                    genreOption.selected = true;
+                }
+                genresSelect.appendChild(genreOption);
+            }))
+    };
+
+    const createAuthorOption = author => {
+        const option = document.createElement('option');
+        option.value = author.id;
+        option.text = author.fullName;
+        return option;
+    };
+
+    const createGenreOption = genre => {
+        const option = document.createElement('option');
+        option.value = genre.id;
+        option.text = genre.name;
+        return option;
+    }
+
+    const saveBook = () => {
+        if (bookId === '') {
+            createBook(buildBook())
+                .catch(r => alert(r));
+            return;
+        }
+        updateBook(bookId, buildBook())
+            .then(_ => window.location = '/')
+            .catch(r => alert(r));
+    };
 
     const buildBook = () => {
         return {
-            title: document.getElementById('title-input').value,
+            id: bookId,
+            title: titleInput.value,
             authorId: authorSelect.options[authorSelect.selectedIndex].value,
             genreIds: Array.from(genresSelect.selectedOptions).map(o => o.value)
         }
