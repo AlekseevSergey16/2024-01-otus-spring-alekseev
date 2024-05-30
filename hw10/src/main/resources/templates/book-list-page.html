@@ -23,6 +23,35 @@
             width: 50px;
         }
     </style>
+    <script type="text/javascript" th:src="@{/api.js}"></script>
+    <script>
+        const getAllBooks = () => fetch('/api/books')
+            .then(resp => resp.json())
+            .then(books => books.forEach(b => document.getElementById('books').appendChild(createTrBook(b))));
+
+        const createTrBook = book => {
+            const tr = document.createElement('tr');
+            tr.id = 'trBook' + book.id;
+            tr.innerHTML = `
+                        <td>${book.id}</td>
+                        <td>${book.title}</td>
+                        <td>${book.author.fullName}</td>
+                        <td>${book.genres.map(g => g.name).join(', ')}</td>
+                        <td>
+                            <a href="/books/${book.id}">Edit</a>
+                            <button type="button" onclick="deleteBook(${book.id})">Delete</button>
+                        </td>
+                    `;
+            return tr;
+        }
+
+        const deleteBook = bookId => {
+            console.log(bookId);
+            deleteBookById(bookId)
+                .then(_ => document.getElementById('trBook' + bookId).remove())
+                .catch(r => alert(r));
+        }
+    </script>
 </head>
 <body onload="getAllBooks()">
 <h3>Books:</h3>
@@ -39,25 +68,5 @@
     </thead>
     <tbody id="books"></tbody>
 </table>
-<script>
-    const getAllBooks = () => fetch('/api/books')
-        .then(resp => resp.json())
-        .then(books => books.forEach(b => document.getElementById('books').appendChild(createTrBook(b))));
-
-    const createTrBook = book => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-                        <td>${book.id}</td>
-                        <td>${book.title}</td>
-                        <td>${book.author.fullName}</td>
-                        <td>${book.genres.map(g => g.name).join(', ')}</td>
-                        <td>
-                            <a href="/books/${book.id}">Edit</a>
-                            <a href="/books/${book.id}">Delete</a>
-                        </td>
-                    `;
-        return tr;
-    }
-</script>
 </body>
 </html>

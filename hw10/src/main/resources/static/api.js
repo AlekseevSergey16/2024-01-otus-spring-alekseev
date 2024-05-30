@@ -25,5 +25,8 @@ const updateBook = (bookId, book) => fetch('/api/books/' + bookId, {
     body: JSON.stringify(book)
 });
 
+const deleteBookById = bookId =>
+    fetch('/api/books/' + bookId, { method: 'delete' });
+
 
 
