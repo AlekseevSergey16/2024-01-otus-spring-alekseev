@@ -39,7 +39,7 @@ public class CommentController {
         return commentService.findByBookId(bookId);
     }
 
-    @DeleteMapping("/api/comment/{id}")
+    @DeleteMapping("/api/comments/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCommentById(@PathVariable long id) {
         commentService.deleteById(id);
