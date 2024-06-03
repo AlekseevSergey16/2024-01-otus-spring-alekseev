@@ -80,7 +80,7 @@ public class CommentControllerTest {
 
     @Test
     void shouldGetCommentById() throws Exception {
-        CommentDto expectedComment = new CommentDto(2L, "text", 3L, "");
+        CommentDto expectedComment = new CommentDto(2L, "text", 3L);
         when(commentService.findById(2L)).thenReturn(expectedComment);
 
         MvcResult result = mockMvc.perform(get("/api/comments/2"))

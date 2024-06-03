@@ -119,7 +119,7 @@ public class BookControllerTest {
     void shouldReturn404IfBookIsNotExist() throws Exception {
         when(bookService.findById(11)).thenThrow(new EntityNotFoundException());
 
-        mockMvc.perform(get("/api/books/10"))
+        mockMvc.perform(get("/api/books/11"))
                 .andExpect(status().isNotFound());
     }
 

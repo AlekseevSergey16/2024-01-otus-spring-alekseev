@@ -10,7 +10,7 @@ public class CommentMapper {
 
     public CommentDto toDto(Comment comment) {
         return new CommentDto(
-                comment.getId(), comment.getText(), comment.getBook().getId(), comment.getBook().getTitle());
+                comment.getId(), comment.getText(), comment.getBook().getId());
     }
 
     public CommentSummaryDto toSummaryDto(Comment comment) {
