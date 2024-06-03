@@ -15,7 +15,6 @@ import ru.otus.hw.repositories.CommentRepository;
 import ru.otus.hw.services.CommentService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

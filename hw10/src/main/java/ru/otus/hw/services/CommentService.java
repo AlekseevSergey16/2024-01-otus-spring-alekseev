@@ -5,7 +5,6 @@ import ru.otus.hw.dto.comment.CommentDto;
 import ru.otus.hw.dto.comment.CommentSummaryDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CommentService {
 
