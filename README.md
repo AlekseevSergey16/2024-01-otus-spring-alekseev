@@ -13,4 +13,6 @@
 - hw05 - Spring JDBC
 - hw06 - Spring ORM + JPA + Hibernate
 - hw07 - Spring Data JPA
+- hw08 - Spring Data MongoDB
+- hw09 - Spring MVC View
 - hw10 - Spring MVC Ajax
