@@ -18,4 +18,14 @@ values ('Советую к прочтению', 1);
 
 -- user password
 insert into users (username, password)
-values ('user', '$2a$10$anKoTk6VG1jkmDjSveW3j.RSBvsPf0T/sf0wmV/RZHumvVUw4NIi2')
+values
+    ('admin', '$2a$10$anKoTk6VG1jkmDjSveW3j.RSBvsPf0T/sf0wmV/RZHumvVUw4NIi2'),
+    ('user', '$2a$10$anKoTk6VG1jkmDjSveW3j.RSBvsPf0T/sf0wmV/RZHumvVUw4NIi2');
+
+insert into roles (name)
+values ('ADMIN'),
+       ('USER');
+
+insert into users_roles (user_id, role_id)
+values (1, 1),
+       (2, 2);
