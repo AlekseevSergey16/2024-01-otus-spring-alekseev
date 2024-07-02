@@ -17,7 +17,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                    .anyRequest().authenticated()
+                        .requestMatchers("/books/*/comments/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers("/books/**").hasAuthority("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
