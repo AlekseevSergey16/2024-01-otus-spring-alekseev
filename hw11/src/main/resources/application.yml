@@ -4,14 +4,3 @@ spring:
       host: 127.0.0.1
       port: 27017
       database: local
-
-  main:
-    allow-bean-definition-overriding: true
-
-mongock:
-  runner-type: InitializingBean
-  change-logs-scan-package: ru.otus.hw.changelogs
-  mongo-db:
-    write-concern:
-      journal: false
-    read-concern: local
