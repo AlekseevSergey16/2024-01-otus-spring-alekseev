@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        .errors {
+            color: red;
+        }
+    </style>
+    <script type="text/javascript" th:src="@{/api.js}"></script>
+</head>
+<body onload="initForm()">
+<h3>Book Info:</h3>
+<form id="book-form" method="post">
+    <input id="bookId" type="hidden" value="" th:value="${bookId}" />
+
+    <div class="row">
+        <label for="title-input">Title:</label>
+        <input id="title-input" name="title" type="text"/>
+    </div>
+
+    <div class="row">
+        <label for="author-select">Author:</label>
+        <select id="author-select"></select>
+    </div>
+
+    <div class="row">
+        <label for="genres-select">Genres:</label>
+        <select id="genres-select" multiple></select>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="saveBook()">Save</button>
+        <a href="/"><button type="button">Back</button></a>
+    </div>
+</form>
+<script>
+    const bookId = document.getElementById('bookId').value;
+    const titleInput = document.getElementById('title-input');
+    const authorSelect = document.getElementById('author-select');
+    const genresSelect = document.getElementById('genres-select');
+
+    const initForm = () => {
+        if (bookId === '') {
+            initCreateForm();
+            return;
+        }
+        initEditForm();
+    }
+
+    const initCreateForm = () => {
+        fetchAuthors()
+            .then(authors => authors.map(a => createAuthorOption(a)).forEach(opt => authorSelect.appendChild(opt)))
+            .catch(r => alert(r));
+        fetchGenres()
+            .then(genres => genres.map(g => createGenreOption(g)).forEach(opt => genresSelect.appendChild(opt)))
+            .catch(r => alert(r));
+    }
+
+    const initEditForm = () => {
+        fetchBookById(bookId)
+            .then(book => fillBook(book))
+            .catch(r => alert(r));
+    }
+
+    const fillBook = book => {
+        titleInput.value = book.title;
+        fetchAuthors()
+            .then(authors => authors.forEach(author => {
+                const authorOption = createAuthorOption(author);
+                if (book.authorId === author.id) {
+                    authorOption.selected = true;
+                }
+                authorSelect.appendChild(authorOption);
+            }));
+
+        fetchGenres()
+            .then(genres => genres.forEach(genre => {
+                const genreOption = createGenreOption(genre);
+                if (book.genreIds.includes(genre.id)) {
+                    genreOption.selected = true;
+                }
+                genresSelect.appendChild(genreOption);
+            }))
+    };
+
+    const createAuthorOption = author => {
+        const option = document.createElement('option');
+        option.value = author.id;
+        option.text = author.fullName;
+        return option;
+    };
+
+    const createGenreOption = genre => {
+        const option = document.createElement('option');
+        option.value = genre.id;
+        option.text = genre.name;
+        return option;
+    }
+
+    const saveBook = () => {
+        if (bookId === '') {
+            createBook(buildBook())
+                .catch(r => alert(r));
+            return;
+        }
+        updateBook(bookId, buildBook())
+            .then(_ => window.location = '/')
+            .catch(r => alert(r));
+    };
+
+    const buildBook = () => {
+        return {
+            id: bookId,
+            title: titleInput.value,
+            authorId: authorSelect.options[authorSelect.selectedIndex].value,
+            genreIds: Array.from(genresSelect.selectedOptions).map(o => o.value)
+        }
+    }
+</script>
+</body>
+</html>
