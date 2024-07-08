@@ -3,17 +3,12 @@ package ru.otus.hw.controllers.rest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.dto.book.BookCreateDto;
-import ru.otus.hw.dto.book.BookDto;
-import ru.otus.hw.dto.book.BookSummaryDto;
 import ru.otus.hw.dto.book.BookUpdateDto;
 import ru.otus.hw.services.BookService;
 
@@ -33,7 +28,8 @@ public class BookHandler {
                 .flatMap(bookService::create)
                 .flatMap(book -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(fromValue(book)));
+                        .body(fromValue(book)))
+                .switchIfEmpty(ServerResponse.badRequest().build());
     }
 
     public Mono<ServerResponse> updateBook(ServerRequest request) {
@@ -42,7 +38,8 @@ public class BookHandler {
                 .flatMap(bookService::update)
                 .flatMap(book -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(fromValue(book)));
+                        .body(fromValue(book)))
+                .switchIfEmpty(ServerResponse.badRequest().build());
     }
 
     public Mono<ServerResponse> getAllBooks(ServerRequest request) {
@@ -56,7 +53,8 @@ public class BookHandler {
         return bookService.findById(request.pathVariable("id"))
                 .flatMap(books -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(fromValue(books)));
+                        .body(fromValue(books)))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> deleteBook(ServerRequest request) {

@@ -1,6 +1,5 @@
 package ru.otus.hw.dto.book;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +17,6 @@ import java.util.Set;
 public class BookUpdateDto {
 
     @NotNull
-    @Min(1)
     private String id;
 
     @NotBlank(message = "title should not be blank")

@@ -19,8 +19,8 @@ public class Book {
 
     private final String title;
 
-    private final String authorId;
+    private final Author author;
 
-    private final List<String> genreIds;
+    private final List<Genre> genres;
 
 }

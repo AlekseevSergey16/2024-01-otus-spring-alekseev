@@ -19,9 +19,7 @@ import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 import ru.otus.hw.services.BookService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -52,7 +50,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Mono<BookDto> create(BookCreateDto bookDto) {
         Mono<List<Genre>> genreListMono = genreRepository.findAllById(bookDto.getGenreIds()).collectList();
-        Mono<Optional<Author>> authorMono = authorRepository.findById(bookDto.getAuthorId()).map(Optional::ofNullable);
+        Mono<Author> authorMono = authorRepository.findById(bookDto.getAuthorId());
 
         return Mono.zip(genreListMono, authorMono)
                 .flatMap(tuple -> {
@@ -62,38 +60,40 @@ public class BookServiceImpl implements BookService {
                                 "One or all genres with ids %s not found".formatted(bookDto.getGenreIds())));
                     }
 
-                    Optional<Author> author = tuple.getT2();
-                    if (author.isEmpty()) {
-                        return Mono.error(new EntityNotFoundException(
-                                "Author with id %s not found".formatted(bookDto.getAuthorId())));
-                    }
-
+                    Author author = tuple.getT2();
                     return bookRepository.save(Book.builder()
                                     .title(bookDto.getTitle())
-                                    .authorId(author.get().getId())
-                                    .genreIds(genres.stream().map(Genre::getId).toList())
+                                    .author(author)
+                                    .genres(genres.stream().toList())
                                     .build());
                 })
                 .map(bookMapper::toDto);
-
-//        return bookRepository.save(Book.builder()
-//                        .title(bookDto.getTitle())
-//                        .authorId(bookDto.getAuthorId())
-//                        .genreIds(new ArrayList<>(bookDto.getGenreIds()))
-//                        .build())
-//                .map(bookMapper::toDto);
     }
 
     @Transactional
     @Override
     public Mono<BookDto> update(BookUpdateDto bookDto) {
-        return bookRepository.findById(bookDto.getId())
-                .map(book -> book.toBuilder()
-                        .title(bookDto.getTitle())
-                        .authorId(bookDto.getAuthorId())
-                        .genreIds(new ArrayList<>(bookDto.getGenreIds()))
-                        .build())
-                .flatMap(bookRepository::save)
+        Mono<Book> bookMono = bookRepository.findById(bookDto.getId());
+        Mono<List<Genre>> genreListMono = genreRepository.findAllById(bookDto.getGenreIds()).collectList();
+        Mono<Author> authorMono = authorRepository.findById(bookDto.getAuthorId());
+
+        return Mono.zip(bookMono, genreListMono, authorMono)
+                .flatMap(tuple -> {
+                    Book book = tuple.getT1();
+                    List<Genre> genres = tuple.getT2();
+                    Author author = tuple.getT3();
+
+                    if (genres.isEmpty() || bookDto.getGenreIds().size() != genres.size()) {
+                        return Mono.error(new EntityNotFoundException(
+                                "One or all genres with ids %s not found".formatted(bookDto.getGenreIds())));
+                    }
+
+                    return bookRepository.save(book.toBuilder()
+                            .title(bookDto.getTitle())
+                            .author(author)
+                            .genres(genres)
+                            .build());
+                })
                 .map(bookMapper::toDto);
     }
 
