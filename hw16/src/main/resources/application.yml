@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:maindb
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    open-in-view: false
+  liquibase:
+   change-log: classpath:db/changelog/db.changelog-master.xml
+  sql:
+    init:
+      data-locations: classpath:data.sql
+  jmx:
+    enabled: true
+
+logging:
+  level:
+    root: info
+  file:
+    name: ./logs/app.log
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, logfile, metrics
+  health:
+    defaults:
+      enabled: true
