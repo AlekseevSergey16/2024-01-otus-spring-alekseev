@@ -14,14 +14,20 @@ public class BooksCountHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        long booksCount = bookRepository.count();
-        if (booksCount > 0) {
-            return Health.up()
-                    .withDetail("msg", "Books count: " + booksCount)
+        try {
+            long booksCount = bookRepository.count();
+            if (booksCount > 0) {
+                return Health.up()
+                        .withDetail("msg", "Books count: " + booksCount)
+                        .build();
+            }
+            return Health.down()
+                    .withDetail("msg", "Books count <= 0: " + booksCount)
+                    .build();
+        } catch (Exception e) {
+            return Health.down()
+                    .withDetail("error", e.getMessage() == null ? "Couldn't get the number of books" : e.getMessage())
                     .build();
         }
-        return Health.down()
-                .withDetail("msg", "Books count <= 0: " + booksCount)
-                .build();
     }
 }
