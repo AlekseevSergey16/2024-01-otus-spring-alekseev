@@ -1,12 +1,12 @@
-package ru.otus.hw.controllers.rest;
+package ru.otus.hw.controllers.rest.handlers;
 
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.dto.book.BookCreateDto;
 import ru.otus.hw.dto.book.BookUpdateDto;
@@ -65,7 +65,7 @@ public class BookHandler {
     private <T> void validate(T object) {
         var errors = validator.validate(object);
         if (!errors.isEmpty()) {
-            throw new ConstraintViolationException(errors);
+            throw new ServerWebInputException(errors.toString());
         }
     }
 

@@ -1,4 +1,4 @@
-package ru.otus.hw.controllers.rest;
+package ru.otus.hw.controllers.rest.handlers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
